@@ -59,7 +59,7 @@ export function SubmitForm() {
           <button type="button" onClick={submitAnother} className="btn-secondary">
             Submit another
           </button>
-          <a href="/#directory" className="btn-primary">
+          <a href="/directory" className="btn-primary">
             Browse the directory
           </a>
         </div>

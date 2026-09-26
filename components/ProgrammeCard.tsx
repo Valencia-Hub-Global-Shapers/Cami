@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatDate, isEmail } from "@/lib/format";
 import { Programme } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
@@ -21,7 +22,12 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
             {programme.university}
           </p>
           <h3 className="mt-1 font-serif text-xl font-semibold leading-snug">
-            {programme.programme_name}
+            <Link
+              href={`/directory/${programme.id}`}
+              className="text-ink hover:text-terracotta"
+            >
+              {programme.programme_name}
+            </Link>
           </h3>
           <p className="mt-1 text-sm text-faint">
             {[programme.city, programme.country].filter(Boolean).join(", ")}

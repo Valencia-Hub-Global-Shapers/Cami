@@ -61,10 +61,10 @@ export default function RootLayout({
               href="/submit"
               className="text-sm font-medium text-ink hover:text-terracotta"
             >
-              Submit a programme
+              Submit<span className="hidden sm:inline"> a programme</span>
             </Link>
-            <Link href="/#directory" className="btn-primary px-5 py-2">
-              Browse the directory
+            <Link href="/directory" className="btn-primary px-5 py-2">
+              Directory
             </Link>
           </nav>
         </header>

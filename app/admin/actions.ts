@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { locationNotice, resolveLocation } from "@/lib/location";
 import {
   missingRequired,
   parseProgrammeFields,
@@ -19,6 +20,9 @@ export async function approveSubmission(formData: FormData) {
 
   const missing = missingRequired(fields);
   if (missing) fail(missing);
+  const resolved = await resolveLocation(formData, fields);
+  if (typeof resolved === "string") fail(resolved);
+  const { latitude, longitude } = resolved;
 
   // Inserting the programme and marking the submission approved happen in
   // one database transaction (see approve_submission in 0002 migration).
@@ -27,6 +31,8 @@ export async function approveSubmission(formData: FormData) {
     p_submission_id: submissionId,
     p_programme: {
       ...fields,
+      latitude,
+      longitude,
       status: parseStatus(formData),
       is_published: true
     }
@@ -35,9 +41,10 @@ export async function approveSubmission(formData: FormData) {
   if (error) fail(`Could not publish this programme: ${error.message}`);
 
   revalidatePath("/");
+  revalidatePath("/directory");
   revalidatePath("/admin");
   revalidatePath("/admin/programmes");
-  redirect("/admin?notice=approved");
+  redirect(`/admin?notice=${locationNotice("approved", resolved)}`);
 }
 
 export async function rejectSubmission(formData: FormData) {

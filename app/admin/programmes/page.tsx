@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import {
   createProgramme,
   deleteProgramme,
+  locateMissing,
   togglePublished,
   updateAssessment,
   updateProgramme
@@ -25,7 +26,12 @@ const ACTIONS = ["APPLY", "MONITOR", "SKIP"];
 export default async function AdminProgrammesPage({
   searchParams
 }: {
-  searchParams: { notice?: string; error?: string };
+  searchParams: {
+    notice?: string;
+    error?: string;
+    found?: string;
+    missed?: string;
+  };
 }) {
   const supabase = createClient();
 
@@ -48,6 +54,8 @@ export default async function AdminProgrammesPage({
       a.university.localeCompare(b.university)
   );
 
+  const unlocated = rows.filter((p) => p.latitude == null).length;
+
   return (
     <div className="gutter py-10">
       <AdminNav active="programmes" />
@@ -61,7 +69,27 @@ export default async function AdminProgrammesPage({
           </p>
         </div>
       </div>
-      <Notice notice={searchParams.notice} error={searchParams.error} />
+      <Notice
+        notice={searchParams.notice}
+        error={searchParams.error}
+        detail={locatedDetail(searchParams)}
+      />
+
+      {unlocated > 0 && (
+        <form
+          action={locateMissing}
+          className="mt-6 flex flex-wrap items-center gap-4 rounded-card border border-border bg-white p-4 text-sm"
+        >
+          <p className="flex-1 text-muted">
+            {unlocated} {unlocated === 1 ? "programme has" : "programmes have"}{" "}
+            no map pin. Look them up on OpenStreetMap by university name (up to
+            8 at a time, about one per second).
+          </p>
+          <button type="submit" className="btn-secondary">
+            Find missing map locations
+          </button>
+        </form>
+      )}
 
       <details className="mt-8 rounded-card border border-dashed border-border bg-white p-5 sm:p-6">
         <summary className="cursor-pointer font-medium">
@@ -117,6 +145,11 @@ function ProgrammeRow({
               {programme.programme_name}
             </h2>
             <StatusBadge status={programme.status} />
+            {programme.latitude == null && (
+              <span className="rounded-pill border border-border px-2.5 py-0.5 text-xs font-semibold text-faint">
+                No map pin
+              </span>
+            )}
             {!programme.is_published && (
               <span className="rounded-pill border border-faint px-2.5 py-0.5 text-xs font-semibold text-faint">
                 Hidden
@@ -159,6 +192,8 @@ function ProgrammeRow({
             values={programme}
             status={programme.status}
             idPrefix={programme.id}
+            latitude={programme.latitude}
+            longitude={programme.longitude}
           />
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 text-sm">
@@ -285,4 +320,21 @@ function ScoreField({
       </select>
     </label>
   );
+}
+
+function locatedDetail(params: {
+  notice?: string;
+  found?: string;
+  missed?: string;
+}): string | undefined {
+  if (params.notice !== "located") return undefined;
+  const found = Number(params.found) || 0;
+  const missed = Number(params.missed) || 0;
+  const parts = [`Placed ${found} map ${found === 1 ? "pin" : "pins"}.`];
+  if (missed > 0) {
+    parts.push(
+      `${missed} could not be matched to a university or college on OpenStreetMap: add coordinates by hand under "Edit public details" if they should have a pin.`
+    );
+  }
+  return parts.join(" ");
 }

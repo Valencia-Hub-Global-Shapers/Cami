@@ -54,3 +54,32 @@ export function missingRequired(fields: ProgrammeFields): string | null {
   }
   return null;
 }
+
+export type Location = { latitude: number | null; longitude: number | null };
+
+// Accepts "41.5021, 2.1045" as copied from Google Maps or OpenStreetMap.
+// Empty means "no pin". Returns an error message for anything else.
+export function parseLocation(formData: FormData): Location | string {
+  const raw = String(formData.get("coordinates") ?? "").trim();
+  if (!raw) return { latitude: null, longitude: null };
+
+  const parts = raw.split(/[,\s;]+/).filter(Boolean).map(Number);
+  const [latitude, longitude] = parts;
+  if (
+    parts.length !== 2 ||
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180
+  ) {
+    return 'Coordinates should look like "41.5021, 2.1045" (latitude, longitude).';
+  }
+  return { latitude, longitude };
+}
+
+export function formatLocation(
+  latitude: number | null | undefined,
+  longitude: number | null | undefined
+): string {
+  return latitude != null && longitude != null ? `${latitude}, ${longitude}` : "";
+}

@@ -25,6 +25,8 @@ export type Programme = {
   website: string | null;
   contact: string | null;
   notes: string | null;
+  latitude: number | null;
+  longitude: number | null;
   is_published: boolean;
   last_verified_at: string | null;
   created_at: string;
