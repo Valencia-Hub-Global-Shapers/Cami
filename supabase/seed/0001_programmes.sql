@@ -79,7 +79,7 @@ with inserted as (
     'SAID Foundation Scholarship', null, null,
     array['Master''s'],
     null,
-    null, '30th October 2026', '2027-2028',
+    '1 September 2026', '30 October 2026', '2027-2028',
     null, null, null,
     'monitor',
     'https://saidfoundation.org/apply/',

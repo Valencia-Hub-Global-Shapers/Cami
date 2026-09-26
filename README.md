@@ -9,17 +9,24 @@ Vercel.
 ## 1. Set up Supabase
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. Open the SQL editor and run `supabase/migrations/0001_init.sql`. This
-   creates all four tables (`programmes`, `internal_assessments`,
-   `submissions`, `profiles`) and their Row Level Security policies.
+2. Open the SQL editor and run `supabase/migrations/0001_init.sql`, then
+   `supabase/migrations/0002_admin_helpers.sql`. The first creates all four
+   tables (`programmes`, `internal_assessments`, `submissions`, `profiles`)
+   and their Row Level Security policies. The second is required: it fixes
+   the admin policies (without it every admin query fails with "infinite
+   recursion detected in policy"), keeps `updated_at` current, and adds the
+   `approve_submission` function that publishes a submission in a single
+   transaction.
 3. Run `supabase/seed/0001_programmes.sql` to load the five known
    programmes as published entries, with their internal triage scores.
 4. Go to **Authentication > Providers** and confirm Email is enabled
    (it is by default). This app uses magic-link sign-in for admins, no
    password needed.
 5. Go to **Authentication > URL Configuration** and add your eventual
-   production URL (e.g. `https://cami.vercel.app`) plus
-   `http://localhost:3000` for local development, under Redirect URLs.
+   production URL (e.g. `https://cami.vercel.app/**`) plus
+   `http://localhost:3000/**` for local development, under Redirect URLs.
+   Sign-in links return to `/auth/callback`, so the `/**` wildcard (or that
+   exact path) must be allowed.
 6. Go to **Project Settings > API** and copy the **Project URL** and the
    **anon public** key, you'll need both in the next step.
 
@@ -71,12 +78,20 @@ Visit `http://localhost:3000`.
 - `/`: public directory, filterable by country, degree level and status.
 - `/submit`: public submission form, no login required.
 - `/admin/login`: magic-link sign-in for the review team.
-- `/admin`: pending submissions, with Approve (publishes to the live
-  directory) and Reject actions.
-- `/admin/programmes`: publish/unpublish any programme and edit its
-  internal-only triage scores (funding, fit, success probability).
-- `supabase/migrations/0001_init.sql`: full schema and RLS policies.
+- `/auth/callback`: completes magic-link sign-in and sends admins on to
+  `/admin`.
+- `/admin`: pending submissions as editable, pre-filled forms, with
+  Approve (publishes to the live directory in one transaction) and Reject
+  actions. `/admin?tab=history` lists approved and rejected submissions.
+- `/admin/programmes`: add, edit, publish/unpublish and delete programmes,
+  mark them as checked today, and edit their internal-only triage scores
+  (funding, fit, success probability).
+- `supabase/migrations/`: full schema, RLS policies and admin helpers.
 - `supabase/seed/0001_programmes.sql`: the five known programmes.
+- `docs/`: the project handoff document and the original seed CSV.
+
+Run `npm run lint` and `npm run build` before pushing; both should pass
+cleanly.
 
 ## 5. Design tokens
 

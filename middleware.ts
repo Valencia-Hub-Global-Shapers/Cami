@@ -28,15 +28,18 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginRoute = request.nextUrl.pathname.startsWith("/admin/login");
+  const { pathname } = request.nextUrl;
+  const isAdminRoute = pathname.startsWith("/admin");
+  // Login and sign-out must stay reachable for signed-in non-admins too.
+  const isOpenRoute =
+    pathname.startsWith("/admin/login") || pathname.startsWith("/admin/signout");
 
-  if (isAdminRoute && !isLoginRoute && !user) {
+  if (isAdminRoute && !isOpenRoute && !user) {
     const redirectUrl = new URL("/admin/login", request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isAdminRoute && !isLoginRoute && user) {
+  if (isAdminRoute && !isOpenRoute && user) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")

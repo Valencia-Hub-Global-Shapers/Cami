@@ -76,3 +76,14 @@ export const STATUS_LABELS: Record<ProgrammeStatus, string> = {
   closed: "Closed",
   monitor: "Monitor"
 };
+
+export const DEGREE_LEVELS = ["Bachelor", "Master's", "PhD"];
+
+// Order used on the public directory: actionable entries first.
+export const STATUS_ORDER: ProgrammeStatus[] = [
+  "open",
+  "expected",
+  "monitor",
+  "renewal_only",
+  "closed"
+];

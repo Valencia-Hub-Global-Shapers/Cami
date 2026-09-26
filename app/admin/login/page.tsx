@@ -1,9 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+const ERROR_MESSAGES: Record<string, string> = {
+  not_admin:
+    "This account is signed in but is not an admin yet. Ask the Valencia Hub team to grant access.",
+  link_invalid: "That sign-in link has expired or was already used. Request a new one."
+};
+
 export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const urlError = ERROR_MESSAGES[searchParams.get("error") ?? ""];
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle"
@@ -16,18 +33,25 @@ export default function AdminLoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/admin`
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin`,
+        shouldCreateUser: true
       }
     });
     setStatus(error ? "error" : "sent");
   }
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col gap-6 px-8 py-24">
+    <div className="mx-auto flex max-w-sm flex-col gap-6 px-4 py-24 sm:px-8">
       <h1 className="font-serif text-3xl font-semibold">Admin sign in</h1>
+      {urlError && status !== "sent" && (
+        <p role="alert" className="rounded-card border border-border bg-sand p-4 text-sm text-muted">
+          {urlError}
+        </p>
+      )}
       {status === "sent" ? (
-        <p className="text-muted">
-          Check your inbox for a sign-in link.
+        <p className="text-muted" role="status">
+          Check <strong className="text-ink">{email}</strong> for a sign-in
+          link. You can close this tab.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -36,20 +60,21 @@ export default function AdminLoginPage() {
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-border bg-white px-4 py-2.5"
+              className="input"
             />
           </label>
           <button
             type="submit"
             disabled={status === "sending"}
-            className="rounded-pill bg-terracotta px-6 py-2.5 font-medium text-cream hover:bg-terracotta-hover"
+            className="btn-primary"
           >
             {status === "sending" ? "Sending..." : "Send sign-in link"}
           </button>
           {status === "error" && (
-            <p className="text-sm text-[#9C4A3A]">
+            <p role="alert" className="text-sm text-danger">
               Could not send the link. Check the address and try again.
             </p>
           )}

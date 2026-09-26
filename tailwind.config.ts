@@ -15,11 +15,12 @@ const config: Config = {
         sand: "#F1E9D8",
         border: "#E6DDCC",
         muted: "#4A4438",
-        faint: "#8A8271"
+        faint: "#8A8271",
+        danger: "#9C4A3A"
       },
       fontFamily: {
-        serif: ["Fraunces", "serif"],
-        sans: ["IBM Plex Sans", "sans-serif"]
+        serif: ["var(--font-fraunces)", "Georgia", "serif"],
+        sans: ["var(--font-plex)", "system-ui", "sans-serif"]
       },
       borderRadius: {
         card: "16px",

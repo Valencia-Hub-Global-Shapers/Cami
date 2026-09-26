@@ -1,39 +1,59 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { formatDate } from "@/lib/format";
 import { Submission } from "@/lib/types";
+import { AdminNav } from "@/components/admin/AdminNav";
+import { Notice } from "@/components/admin/Notice";
+import { ProgrammeFieldset } from "@/components/admin/ProgrammeFieldset";
 import { approveSubmission, rejectSubmission } from "./actions";
 
-export default async function AdminQueuePage() {
+export const metadata: Metadata = {
+  title: "Review queue",
+  robots: { index: false }
+};
+export const dynamic = "force-dynamic";
+
+export default async function AdminQueuePage({
+  searchParams
+}: {
+  searchParams: { tab?: string; notice?: string; error?: string };
+}) {
+  const isHistory = searchParams.tab === "history";
   const supabase = createClient();
 
-  const { data: pending } = await supabase
+  const query = supabase
     .from("submissions")
     .select("*")
-    .eq("review_status", "pending")
     .order("created_at", { ascending: false });
+  const { data } = isHistory
+    ? await query.neq("review_status", "pending").limit(200)
+    : await query.eq("review_status", "pending");
 
-  const submissions = (pending as Submission[]) ?? [];
+  const submissions = (data as Submission[] | null) ?? [];
 
   return (
-    <div className="px-8 py-12 md:px-16">
-      <div className="flex items-center justify-between">
-        <h1 className="font-serif text-3xl font-semibold">
-          Submission queue
-        </h1>
-        <Link
-          href="/admin/programmes"
-          className="text-sm font-medium text-terracotta"
-        >
-          Manage published programmes →
-        </Link>
-      </div>
+    <div className="gutter py-10">
+      <AdminNav active={isHistory ? "history" : "pending"} />
+      <h1 className="mt-8 font-serif text-3xl font-semibold">
+        {isHistory ? "Review history" : "Pending submissions"}
+      </h1>
+      <p className="mt-2 text-muted">
+        {isHistory
+          ? "Approved and rejected submissions, newest first."
+          : "Check each entry against its official source, correct anything that needs it, then approve or reject."}
+      </p>
+      <Notice notice={searchParams.notice} error={searchParams.error} />
 
       {submissions.length === 0 ? (
-        <p className="mt-8 text-muted">Nothing pending review.</p>
+        <p className="mt-8 rounded-card border border-dashed border-border p-8 text-center text-muted">
+          {isHistory ? "No reviewed submissions yet." : "Nothing pending review."}
+        </p>
+      ) : isHistory ? (
+        <HistoryTable submissions={submissions} />
       ) : (
         <div className="mt-8 flex flex-col gap-6">
           {submissions.map((s) => (
-            <SubmissionRow key={s.id} submission={s} />
+            <SubmissionReview key={s.id} submission={s} />
           ))}
         </div>
       )}
@@ -41,85 +61,125 @@ export default async function AdminQueuePage() {
   );
 }
 
-function SubmissionRow({ submission }: { submission: Submission }) {
+function SubmittedBy({ submission }: { submission: Submission }) {
   return (
-    <div className="rounded-card border border-border bg-white p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="font-serif text-xl font-semibold">
-            {submission.programme_name}
-          </h2>
-          <p className="text-sm text-muted">
-            {submission.university}, {submission.country}
-          </p>
-        </div>
-        <p className="text-xs text-faint">
-          Submitted by {submission.submitter_name} ·{" "}
-          {submission.submitter_hub} · {submission.submitter_email}
-        </p>
-      </div>
-
-      <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 text-sm text-muted md:grid-cols-2">
-        <Detail label="Coverage" value={submission.coverage} />
-        <Detail label="Eligibility" value={submission.main_eligibility} />
-        <Detail label="Deadline" value={submission.estimated_deadline} />
-        <Detail
-          label="Website / contact"
-          value={submission.website || submission.contact}
-        />
-        <Detail label="Notes" value={submission.notes} />
-      </dl>
-
-      <div className="mt-6 flex flex-wrap gap-4 border-t border-border pt-4">
-        <form action={approveSubmission} className="flex flex-wrap gap-2">
-          <input type="hidden" name="submission_id" value={submission.id} />
-          <input
-            type="hidden"
-            name="university"
-            value={submission.university}
-          />
-          <input type="hidden" name="country" value={submission.country} />
-          <input
-            type="hidden"
-            name="programme_name"
-            value={submission.programme_name}
-          />
-          <button
-            type="submit"
-            className="rounded-pill bg-terracotta px-5 py-2 text-sm font-medium text-cream hover:bg-terracotta-hover"
-          >
-            Approve and publish
-          </button>
-        </form>
-
-        <form action={rejectSubmission} className="flex flex-1 gap-2">
-          <input type="hidden" name="submission_id" value={submission.id} />
-          <input
-            type="text"
-            name="reviewer_notes"
-            placeholder="Reason (optional)"
-            className="flex-1 rounded-pill border border-border px-4 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            className="rounded-pill border border-ink px-5 py-2 text-sm font-medium hover:bg-ink hover:text-cream"
-          >
-            Reject
-          </button>
-        </form>
-      </div>
-    </div>
+    <p className="text-xs text-faint">
+      {submission.submitter_name} · {submission.submitter_hub} ·{" "}
+      <a href={`mailto:${submission.submitter_email}`}>
+        {submission.submitter_email}
+      </a>{" "}
+      · {formatDate(submission.created_at)}
+    </p>
   );
 }
 
-function Detail({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
+function SubmissionReview({ submission }: { submission: Submission }) {
   return (
-    <div>
-      <dt className="text-xs font-semibold uppercase tracking-wide text-faint">
-        {label}
-      </dt>
-      <dd>{value}</dd>
+    <article className="rounded-card border border-border bg-white p-5 sm:p-6">
+      <div className="flex flex-col gap-1">
+        <h2 className="font-serif text-xl font-semibold">
+          {submission.programme_name}
+        </h2>
+        <p className="text-sm text-muted">
+          {submission.university}, {submission.country}
+        </p>
+        <SubmittedBy submission={submission} />
+        {submission.website && (
+          <a
+            href={submission.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 break-all text-sm font-medium"
+          >
+            Open source page ↗
+          </a>
+        )}
+      </div>
+
+      <form action={approveSubmission} className="mt-6">
+        <input type="hidden" name="submission_id" value={submission.id} />
+        <details open className="group">
+          <summary className="cursor-pointer text-sm font-medium text-ink">
+            Review and edit details
+          </summary>
+          <div className="mt-4">
+            <ProgrammeFieldset
+              values={submission}
+              status="expected"
+              idPrefix={submission.id}
+            />
+          </div>
+        </details>
+        <div className="mt-6 border-t border-border pt-4">
+          <button type="submit" className="btn-primary">
+            Approve and publish
+          </button>
+        </div>
+      </form>
+
+      <form
+        action={rejectSubmission}
+        className="mt-4 flex flex-col gap-2 sm:flex-row"
+      >
+        <input type="hidden" name="submission_id" value={submission.id} />
+        <input
+          type="text"
+          name="reviewer_notes"
+          aria-label="Reason for rejecting (optional)"
+          placeholder="Reason for rejecting (optional, internal)"
+          className="input sm:flex-1"
+        />
+        <button type="submit" className="btn-secondary">
+          Reject
+        </button>
+      </form>
+    </article>
+  );
+}
+
+function HistoryTable({ submissions }: { submissions: Submission[] }) {
+  return (
+    <div className="mt-8 overflow-x-auto rounded-card border border-border bg-white">
+      <table className="w-full min-w-[640px] text-left text-sm">
+        <thead className="border-b border-border bg-sand">
+          <tr>
+            <th className="label-caps px-4 py-3">Programme</th>
+            <th className="label-caps px-4 py-3">Submitted by</th>
+            <th className="label-caps px-4 py-3">Decision</th>
+            <th className="label-caps px-4 py-3">Reviewer notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {submissions.map((s) => (
+            <tr key={s.id} className="border-b border-border last:border-0 align-top">
+              <td className="px-4 py-3">
+                <p className="font-medium">{s.programme_name}</p>
+                <p className="text-faint">
+                  {s.university}, {s.country}
+                </p>
+              </td>
+              <td className="px-4 py-3 text-muted">
+                <p>{s.submitter_name}</p>
+                <p className="text-faint">
+                  {s.submitter_hub} · {formatDate(s.created_at)}
+                </p>
+              </td>
+              <td className="px-4 py-3">
+                <span
+                  className={`rounded-pill px-2.5 py-0.5 text-xs font-semibold ${
+                    s.review_status === "approved"
+                      ? "bg-[#DCEDE9] text-route"
+                      : "bg-[#EFE3DD] text-danger"
+                  }`}
+                >
+                  {s.review_status === "approved" ? "Approved" : "Rejected"}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-muted">{s.reviewer_notes ?? ""}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
