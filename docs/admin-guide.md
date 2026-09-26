@@ -153,6 +153,43 @@ Authentication > Users. To allow only people you invite:
 With sign-ups off, anyone not invited who tries `/admin/login` sees
 "Could not send the link".
 
+## Map pins
+
+Each programme can have a pin on the directory map. You do not need to
+look up coordinates: when you approve a submission, create a programme or
+save one, Camí asks OpenStreetMap where the university is and stores the
+answer.
+
+- **When it runs:** only when the "Find the location automatically" box is
+  ticked in the Map location section of the form. It is ticked by default
+  for programmes without a pin, and unticked once a pin exists, so saving
+  an edit never moves an existing pin by surprise.
+- **What counts as a match:** only places OpenStreetMap marks as a
+  university or college. A foundation, an office or a city name gets no
+  pin rather than a wrong one. For example, "SAID Foundation" funds study
+  at several UK universities, so it correctly stays off the map and is
+  listed under "Not on the map" in the directory.
+- **If nothing is found:** the programme is still saved and published, and
+  a notice says no location was found. Add coordinates by hand if it should
+  have a pin (see below).
+- **Existing programmes without a pin:** in Programmes, click **Find
+  missing map locations**. It looks up to 8 programmes per click, about one
+  per second, as OpenStreetMap's usage policy asks.
+
+### Check or correct a pin
+
+1. In **Programmes**, open **Edit public details**. The Map location
+   section shows the current pin with a link to check it on OpenStreetMap.
+2. To correct it, open **Set or correct the pin by hand** and type the
+   coordinates as `latitude, longitude`, for example `41.5021, 2.1045`. In
+   Google Maps, right-click the campus and click the numbers at the top of
+   the menu to copy them. Typed coordinates always win over the automatic
+   lookup.
+3. To look it up again after changing the university name, clear the
+   coordinates and tick the automatic box.
+4. To remove a pin, clear the coordinates, leave the box unticked, and
+   save.
+
 ## Troubleshooting
 
 | What the person sees | Cause | Fix |
@@ -163,3 +200,4 @@ With sign-ups off, anyone not invited who tries `/admin/login` sees
 | The link opens the wrong site or shows a Supabase error | The site address is missing from Supabase's redirect list | Authentication > URL Configuration: make sure `https://cami-gs.vercel.app/**` is under Redirect URLs |
 | "This account is signed in but is not an admin yet" | Step 2 was not done, or the email did not match | Run step 3 to check, then step 2 again |
 | Admin pages open but show nothing, or actions fail | Migration `0002_admin_helpers.sql` was not run | Run it in the SQL Editor |
+| Saving a programme fails with a message about `latitude` | Migration `0003_programme_location.sql` was not run | Run it in the SQL Editor |

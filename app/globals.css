@@ -56,3 +56,56 @@
     @apply px-4 sm:px-8 md:px-16;
   }
 }
+
+/* Map pins and popups (components/directory/MapView.tsx). Kept outside
+ @layer on purpose: the status classes are built at runtime, so Tailwind
+ cannot see them and would purge them from a layer. */
+.cami-pin {
+  @apply inline-block h-2.5 w-2.5 rounded-full border-2 border-white align-middle;
+  box-shadow: 0 0 0 1px rgb(33 30 25 / 0.25);
+}
+
+.cami-pin--lg {
+  @apply h-[22px] w-[22px] border-[3px];
+}
+
+.cami-pin--open {
+  @apply bg-route;
+}
+
+.cami-pin--expected {
+  @apply bg-terracotta;
+}
+
+.cami-pin--monitor,
+.cami-pin--renewal_only {
+  @apply bg-faint;
+}
+
+.cami-pin--closed {
+  @apply bg-danger;
+}
+
+.leaflet-container {
+  @apply font-sans;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply rounded-card;
+}
+
+.cami-popup .cami-popup__uni {
+  @apply m-0 text-xs text-faint;
+}
+
+.cami-popup .cami-popup__name {
+  @apply mb-1 mt-0.5 font-serif text-base font-semibold leading-snug text-ink;
+}
+
+.cami-popup .cami-popup__meta {
+  @apply m-0 flex items-center gap-1.5 text-xs text-muted;
+}
+
+.cami-popup .cami-popup__link {
+  @apply mt-2 inline-block text-sm font-medium text-terracotta;
+}

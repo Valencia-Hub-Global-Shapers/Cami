@@ -9,14 +9,15 @@ Vercel.
 ## 1. Set up Supabase
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. Open the SQL editor and run `supabase/migrations/0001_init.sql`, then
-   `supabase/migrations/0002_admin_helpers.sql`. The first creates all four
+2. Open the SQL editor and run the files in `supabase/migrations/` in
+   order: `0001_init.sql`, `0002_admin_helpers.sql`,
+   `0003_programme_location.sql`. The first creates all four
    tables (`programmes`, `internal_assessments`, `submissions`, `profiles`)
    and their Row Level Security policies. The second is required: it fixes
    the admin policies (without it every admin query fails with "infinite
    recursion detected in policy"), keeps `updated_at` current, and adds the
    `approve_submission` function that publishes a submission in a single
-   transaction.
+   transaction. The third adds map coordinates to programmes.
 3. Run `supabase/seed/0001_programmes.sql` to load the five known
    programmes as published entries, with their internal triage scores.
 4. Go to **Authentication > Providers** and confirm Email is enabled
@@ -69,7 +70,13 @@ Visit `http://localhost:3000`.
 
 ## 4. What's in this repo
 
-- `/`: public directory, filterable by country, degree level and status.
+- `/`: landing page: what the site is, headline numbers, a few open or
+  upcoming programmes, and how entries are checked.
+- `/directory`: the full directory, filterable by country, degree level
+  and status, sortable, as a list or on a map. Filters and view are kept
+  in the URL, so a filtered view can be shared as a link.
+- `/directory/[id]`: one page per programme, with all its details and a
+  small map.
 - `/submit`: public submission form, no login required.
 - `/admin/login`: magic-link sign-in for the review team.
 - `/auth/callback`: completes magic-link sign-in and sends admins on to
@@ -79,7 +86,8 @@ Visit `http://localhost:3000`.
   actions. `/admin?tab=history` lists approved and rejected submissions.
 - `/admin/programmes`: add, edit, publish/unpublish and delete programmes,
   mark them as checked today, and edit their internal-only triage scores
-  (funding, fit, success probability).
+  (funding, fit, success probability). Map pins are found automatically
+  from the university name via OpenStreetMap; see the admin guide.
 - `supabase/migrations/`: full schema, RLS policies and admin helpers.
 - `supabase/seed/0001_programmes.sql`: the five known programmes.
 - `docs/`: the project handoff document and the original seed CSV.
@@ -96,7 +104,6 @@ particularly before writing any new marketing copy for this site.
 
 ## 6. Not included yet (see handoff doc for details)
 
-- Map view (pins per programme), planned as a v1.1 addition.
 - Anti-spam tooling on `/submit`, intentionally left out, trust-based by
   decision.
 - Multi-language UI.

@@ -1,16 +1,20 @@
 import { DEGREE_LEVELS, STATUS_LABELS, ProgrammeStatus } from "@/lib/types";
-import { ProgrammeFields } from "@/lib/programme-form";
+import { ProgrammeFields, formatLocation } from "@/lib/programme-form";
 
 // Editable fields shared by the review form, the programme editor and the
 // "new programme" form. Uncontrolled inputs, so it renders on the server.
 export function ProgrammeFieldset({
   values,
   status,
-  idPrefix
+  idPrefix,
+  latitude,
+  longitude
 }: {
   values?: Partial<ProgrammeFields>;
   status?: ProgrammeStatus;
   idPrefix: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }) {
   const v = values ?? {};
   const degrees = v.degree_level ?? [];
@@ -60,6 +64,57 @@ export function ProgrammeFieldset({
       <Input label="Language" name="language" value={v.language} />
       <Input label="Website" name="website" value={v.website} type="url" />
       <Input label="Contact" name="contact" value={v.contact} />
+      <fieldset className="flex flex-col gap-3 rounded-card border border-border bg-cream p-4 text-sm md:col-span-2">
+        <legend className="px-1 font-medium">Map location</legend>
+        {latitude != null && longitude != null ? (
+          <p className="text-muted">
+            Pin at {formatLocation(latitude, longitude)}.{" "}
+            <a
+              href={`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=16/${latitude}/${longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Check it on OpenStreetMap ↗
+            </a>
+          </p>
+        ) : (
+          <p className="text-muted">No map pin yet.</p>
+        )}
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            name="auto_locate"
+            defaultChecked={latitude == null}
+            className="mt-0.5 accent-terracotta"
+          />
+          <span>
+            Find the location automatically from the university name, city
+            and country (OpenStreetMap). Only places marked as a university
+            or college are used, so anything else gets no pin.
+          </span>
+        </label>
+        <details>
+          <summary className="cursor-pointer text-faint">
+            Set or correct the pin by hand
+          </summary>
+          <label className="mt-2 flex flex-col gap-1.5">
+            <span className="text-faint">
+              Latitude, longitude. Typed coordinates always win. Clear this
+              and untick the box above to remove the pin. In Google Maps,
+              right-click the campus and click the numbers to copy them.
+            </span>
+            <input
+              type="text"
+              name="coordinates"
+              inputMode="decimal"
+              placeholder="41.5021, 2.1045"
+              defaultValue={formatLocation(latitude, longitude)}
+              className="input"
+              id={`${idPrefix}-coordinates`}
+            />
+          </label>
+        </details>
+      </fieldset>
       <Area label="Coverage" name="coverage" value={v.coverage} />
       <Area label="Main eligibility" name="main_eligibility" value={v.main_eligibility} />
       <Area label="Required documents" name="required_documents" value={v.required_documents} />
