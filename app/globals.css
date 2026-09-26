@@ -86,6 +86,12 @@
   @apply bg-danger;
 }
 
+/* Soften OpenStreetMap's colours towards the site palette so the pins,
+   not the base map, carry the colour. */
+.cami-tiles {
+  filter: grayscale(0.7) sepia(0.12) brightness(1.04) contrast(0.92);
+}
+
 .leaflet-container {
   @apply font-sans;
 }
