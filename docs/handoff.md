@@ -9,7 +9,7 @@
 
 ## 1. What this is
 
-A public, always-current directory of European university programmes, scholarships and admission pathways for Palestinian students, maintained by Global Shapers hubs worldwide. Two audiences:
+A public, always-current directory of university programmes worldwide, scholarships and admission pathways for Palestinian students, maintained by Global Shapers hubs worldwide. Two audiences:
 
 - **Students** browse a public page: filterable, read-only, no login.
 - **Shapers from any hub** submit new opportunities through a public form, no login required.

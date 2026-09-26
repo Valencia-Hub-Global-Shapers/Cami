@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s · Camí"
   },
   description:
-    "A directory of university admission and scholarship programmes in Europe open to Palestinian students, maintained by Global Shapers hubs."
+    "A directory of university admission and scholarship programmes worldwide open to Palestinian students, maintained by Global Shapers hubs."
 };
 
 export const viewport: Viewport = {

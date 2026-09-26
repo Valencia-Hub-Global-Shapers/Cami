@@ -21,8 +21,8 @@ export default async function HomePage() {
     <div className="flex flex-col">
       <section className="gutter flex flex-col gap-5 py-12 sm:py-20">
         <h1 className="max-w-3xl font-serif text-3xl font-semibold leading-tight sm:text-4xl md:text-5xl">
-          University admission and scholarship programmes in Europe for
-          Palestinian students.
+          University admission and scholarship programmes around the world
+          for Palestinian students.
         </h1>
         <p className="max-w-2xl text-base text-muted sm:text-lg">
           A free directory of programmes that admit or fund Palestinian
