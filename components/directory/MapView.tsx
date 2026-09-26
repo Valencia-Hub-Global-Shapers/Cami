@@ -59,15 +59,15 @@ export default function MapView({
       scrollWheelZoom: false,
       zoomSnap: 0.5
     }).fitBounds(EUROPE);
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 18
-      }
-    ).addTo(map);
+    // OpenStreetMap's standard tiles: no API key, fine for a low-traffic
+    // site under https://operations.osmfoundation.org/policies/tiles/ as
+    // long as the attribution stays visible. Muted in CSS (.cami-tiles).
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      className: "cami-tiles"
+    }).addTo(map);
     // Wheel zoom only after the map is clicked, so page scrolling is not
     // hijacked when the pointer passes over the map.
     map.on("click", () => map.scrollWheelZoom.enable());
