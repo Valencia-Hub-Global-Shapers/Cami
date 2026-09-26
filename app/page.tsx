@@ -106,32 +106,35 @@ export default async function HomePage() {
       </section>
 
       <section
-        id="about"
-        className="gutter grid scroll-mt-4 gap-8 bg-sand py-12 sm:py-16 md:grid-cols-2"
+        aria-labelledby="about-heading"
+        className="gutter grid gap-8 bg-sand py-12 sm:py-16 md:grid-cols-2"
       >
         <div>
           <p className="label-caps text-route">About</p>
-          <h2 className="mt-3 font-serif text-2xl font-semibold sm:text-3xl">
-            How this directory is kept up to date
+          <h2
+            id="about-heading"
+            className="mt-3 font-serif text-2xl font-semibold sm:text-3xl"
+          >
+            Part of Bridging Futures
           </h2>
         </div>
         <div className="flex flex-col gap-4 text-muted">
           <p>
-            Information about which European universities admit and fund
-            Palestinian students is spread across many university websites
-            and changes each academic year. This directory collects it in one
-            place.
+            Camí is the programme directory of Bridging Futures, a Global
+            Shapers Ramallah Hub initiative that supports Palestinian students
+            and graduates with skills training, mentorship and access to
+            opportunities. It is built and maintained with the Valencia Hub.
           </p>
           <p>
-            A review team at the Valencia Hub checks each submission against
-            the official source before publishing it, and each entry shows the
-            date it was last checked.
+            A review team checks each submission against the official source
+            before publishing it, and each entry shows the date it was last
+            checked.
           </p>
-          <p className="flex flex-wrap gap-3 pt-2">
-            <Link href="/directory" className="btn-primary">
-              Browse the directory
+          <p className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-2">
+            <Link href="/about" className="btn-secondary">
+              About Camí and Bridging Futures
             </Link>
-            <Link href="/submit" className="btn-secondary">
+            <Link href="/submit" className="font-medium">
               Submit a programme
             </Link>
           </p>
