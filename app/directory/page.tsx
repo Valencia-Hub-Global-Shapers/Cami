@@ -8,7 +8,7 @@ export const revalidate = 300; // refresh published listings every 5 minutes
 export const metadata: Metadata = {
   title: "Directory",
   description:
-    "Search and filter university admission and scholarship programmes in Europe open to Palestinian students, as a list or on a map."
+    "Search and filter university admission and scholarship programmes worldwide open to Palestinian students, as a list or on a map."
 };
 
 export default async function DirectoryPage() {

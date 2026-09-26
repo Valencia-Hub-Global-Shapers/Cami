@@ -190,11 +190,11 @@ export default function AboutPage() {
             instead of lists spread across documents and messages.
           </p>
           <p>
-            Information about which European universities admit and fund
-            Palestinian students is spread across many university websites and
-            changes each academic year. Camí keeps it in one place: what each
-            programme covers, who can apply, the documents it asks for and its
-            expected dates, with a link to the official source.
+            Information about which universities around the world admit and
+            fund Palestinian students is spread across many university websites
+            and changes each academic year. Camí keeps it in one place: what
+            each programme covers, who can apply, the documents it asks for and
+            its expected dates, with a link to the official source.
           </p>
         </div>
       </section>

@@ -1,7 +1,7 @@
 # Camí
 
-A directory of university admission and scholarship routes for Palestinian
-students in Europe, kept current by Global Shapers hubs worldwide.
+A directory of university admission and scholarship routes worldwide for
+Palestinian students, kept current by Global Shapers hubs.
 
 Built with Next.js (App Router) and Supabase (Postgres + Auth), deployed on
 Vercel.
