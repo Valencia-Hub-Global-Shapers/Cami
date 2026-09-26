@@ -50,10 +50,10 @@ export default function RootLayout({
             <LogoMark />
             <span className="font-serif text-2xl font-semibold">Camí</span>
           </Link>
-          <nav aria-label="Main" className="flex items-center gap-5 sm:gap-8">
+          <nav aria-label="Main" className="flex items-center gap-4 sm:gap-8">
             <Link
-              href="/#about"
-              className="hidden text-sm font-medium text-ink hover:text-terracotta sm:inline"
+              href="/about"
+              className="text-sm font-medium text-ink hover:text-terracotta"
             >
               About
             </Link>
@@ -79,7 +79,11 @@ export default function RootLayout({
             programme&apos;s own website before applying.
           </span>
           <span>
-            Developed by the{" "}
+            Part of{" "}
+            <Link href="/about" className="text-faint underline hover:text-muted">
+              Bridging Futures
+            </Link>
+            , Ramallah Hub. Developed by the{" "}
             <a
               href="https://valencia-hub-global-shapers.github.io/?lang=en"
               className="text-faint underline hover:text-muted"
