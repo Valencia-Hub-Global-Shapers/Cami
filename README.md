@@ -23,7 +23,7 @@ Vercel.
    (it is by default). This app uses magic-link sign-in for admins, no
    password needed.
 5. Go to **Authentication > URL Configuration** and add your eventual
-   production URL (e.g. `https://cami.vercel.app/**`) plus
+   production URL (`https://cami-gs.vercel.app/**`) plus
    `http://localhost:3000/**` for local development, under Redirect URLs.
    Sign-in links return to `/auth/callback`, so the `/**` wildcard (or that
    exact path) must be allowed.
@@ -33,17 +33,11 @@ Vercel.
 ### Make your team admins
 
 Nobody can access `/admin` until they have a row in `profiles` with
-`role = 'admin'`. After someone signs in once through `/admin/login` (which
-creates their `auth.users` row), run in the SQL editor:
-
-```sql
-insert into profiles (id, role, full_name)
-values ('paste-their-auth-user-id-here', 'admin', 'Their Name')
-on conflict (id) do update set role = 'admin';
-```
-
-Find their user id under **Authentication > Users** in the Supabase
-dashboard.
+`role = 'admin'`. There is no button for this in the app: admins are added
+with one SQL query in the Supabase dashboard, after the person has signed in
+once. **See [`docs/admin-guide.md`](docs/admin-guide.md)** for step-by-step
+instructions on adding, listing and removing admins, getting sign-in
+emails delivered, and troubleshooting.
 
 ## 2. Run it locally
 
