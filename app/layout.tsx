@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -93,6 +94,7 @@ export default function RootLayout({
             , Global Shapers Community.
           </span>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
