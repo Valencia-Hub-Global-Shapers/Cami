@@ -3,7 +3,8 @@ import Link from "next/link";
 const LINKS = [
   { href: "/admin", label: "Pending", key: "pending" },
   { href: "/admin?tab=history", label: "History", key: "history" },
-  { href: "/admin/programmes", label: "Programmes", key: "programmes" }
+  { href: "/admin/programmes", label: "Programmes", key: "programmes" },
+  { href: "/admin/account", label: "Account", key: "account" }
 ] as const;
 
 export function AdminNav({
