@@ -22,6 +22,9 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const urlError = ERROR_MESSAGES[searchParams.get("error") ?? ""];
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [usePassword, setUsePassword] = useState(false);
+  const [errorDetail, setErrorDetail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle"
   );
@@ -30,6 +33,21 @@ function LoginForm() {
     e.preventDefault();
     setStatus("sending");
     const supabase = createClient();
+
+    if (usePassword) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (error) {
+        setErrorDetail(error.message);
+        setStatus("error");
+        return;
+      }
+      window.location.assign("/admin");
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -37,6 +55,7 @@ function LoginForm() {
         shouldCreateUser: true
       }
     });
+    setErrorDetail(error ? error.message : "");
     setStatus(error ? "error" : "sent");
   }
 
@@ -66,16 +85,53 @@ function LoginForm() {
               className="input"
             />
           </label>
+          {usePassword && (
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="font-medium">Password</span>
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input"
+              />
+            </label>
+          )}
           <button
             type="submit"
             disabled={status === "sending"}
             className="btn-primary"
           >
-            {status === "sending" ? "Sending..." : "Send sign-in link"}
+            {status === "sending"
+              ? usePassword
+                ? "Signing in..."
+                : "Sending..."
+              : usePassword
+                ? "Sign in"
+                : "Send sign-in link"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setUsePassword(!usePassword);
+              setStatus("idle");
+              setErrorDetail("");
+            }}
+            className="text-sm text-muted underline"
+          >
+            {usePassword ? "Use an email link instead" : "Use a password instead"}
           </button>
           {status === "error" && (
             <p role="alert" className="text-sm text-danger">
-              Could not send the link. Check the address and try again.
+              {usePassword
+                ? "Could not sign in. Check your email and password."
+                : "Could not send the link. Check the address and try again."}
+              {errorDetail && (
+                <span className="mt-1 block text-muted">
+                  Details: {errorDetail}
+                </span>
+              )}
             </p>
           )}
         </form>
