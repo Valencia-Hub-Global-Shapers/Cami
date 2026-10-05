@@ -22,6 +22,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const urlError = ERROR_MESSAGES[searchParams.get("error") ?? ""];
   const [email, setEmail] = useState("");
+  const [errorDetail, setErrorDetail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle"
   );
@@ -37,6 +38,7 @@ function LoginForm() {
         shouldCreateUser: true
       }
     });
+    setErrorDetail(error ? error.message : "");
     setStatus(error ? "error" : "sent");
   }
 
@@ -76,6 +78,11 @@ function LoginForm() {
           {status === "error" && (
             <p role="alert" className="text-sm text-danger">
               Could not send the link. Check the address and try again.
+              {errorDetail && (
+                <span className="mt-1 block text-muted">
+                  Details: {errorDetail}
+                </span>
+              )}
             </p>
           )}
         </form>
