@@ -17,6 +17,8 @@ export type Programme = {
   coverage: string | null;
   estimated_opening: string | null;
   estimated_deadline: string | null;
+  opening_date: string | null; // YYYY-MM-DD
+  deadline_date: string | null; // YYYY-MM-DD
   academic_year: string | null;
   language: string | null;
   main_eligibility: string | null;

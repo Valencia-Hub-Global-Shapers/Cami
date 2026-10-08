@@ -83,3 +83,37 @@ export function formatLocation(
 ): string {
   return latitude != null && longitude != null ? `${latitude}, ${longitude}` : "";
 }
+
+export type ProgrammeDates = {
+  opening_date: string | null;
+  deadline_date: string | null;
+};
+
+function isoDate(raw: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+  const date = new Date(`${raw}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(raw)
+    ? raw
+    : null;
+}
+
+// Exact dates from <input type="date">. Empty means "no date". Returns an
+// error message for an invalid date or a deadline before the opening.
+export function parseDates(formData: FormData): ProgrammeDates | string {
+  const dates: ProgrammeDates = { opening_date: null, deadline_date: null };
+  for (const name of ["opening_date", "deadline_date"] as const) {
+    const raw = String(formData.get(name) ?? "").trim();
+    if (!raw) continue;
+    const valid = isoDate(raw);
+    if (!valid) return "Dates should be valid, for example 2026-10-05.";
+    dates[name] = valid;
+  }
+  if (
+    dates.opening_date &&
+    dates.deadline_date &&
+    dates.deadline_date < dates.opening_date
+  ) {
+    return "The deadline cannot be before the opening date.";
+  }
+  return dates;
+}

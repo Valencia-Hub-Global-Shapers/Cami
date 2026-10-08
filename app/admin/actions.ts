@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { locationNotice, resolveLocation } from "@/lib/location";
 import {
   missingRequired,
+  parseDates,
   parseProgrammeFields,
   parseStatus
 } from "@/lib/programme-form";
@@ -23,6 +24,8 @@ export async function approveSubmission(formData: FormData) {
   const resolved = await resolveLocation(formData, fields);
   if (typeof resolved === "string") fail(resolved);
   const { latitude, longitude } = resolved;
+  const dates = parseDates(formData);
+  if (typeof dates === "string") fail(dates);
 
   // Inserting the programme and marking the submission approved happen in
   // one database transaction (see approve_submission in 0002 migration).
@@ -33,6 +36,7 @@ export async function approveSubmission(formData: FormData) {
       ...fields,
       latitude,
       longitude,
+      ...dates,
       status: parseStatus(formData),
       is_published: true
     }

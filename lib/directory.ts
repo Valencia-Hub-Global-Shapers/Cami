@@ -1,5 +1,6 @@
 import { createPublicClient } from "@/lib/supabase/public";
 import { Programme, STATUS_ORDER } from "@/lib/types";
+import { todayInPalestine, withEffectiveStatus } from "@/lib/programme-status";
 
 // Published programmes, actionable ones first. Shared by the landing page,
 // the directory and the programme pages.
@@ -13,7 +14,12 @@ export async function getPublishedProgrammes(): Promise<{
     .select("*")
     .eq("is_published", true);
 
-  const programmes = ((data as Programme[] | null) ?? []).sort(
+  // Statuses are worked out from today's date on every render, so a
+  // programme closes by itself the day after its deadline.
+  const today = todayInPalestine();
+  const programmes = ((data as Programme[] | null) ?? [])
+    .map((p) => withEffectiveStatus(p, today))
+    .sort(
     (a, b) =>
       STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
       a.university.localeCompare(b.university)
@@ -33,5 +39,5 @@ export async function getPublishedProgramme(
     .eq("id", id)
     .eq("is_published", true)
     .maybeSingle();
-  return (data as Programme | null) ?? null;
+  return data ? withEffectiveStatus(data as Programme) : null;
 }

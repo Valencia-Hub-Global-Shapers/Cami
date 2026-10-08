@@ -7,6 +7,7 @@ import { geocodeUniversity, sleep } from "@/lib/geocode";
 import { locationNotice, resolveLocation } from "@/lib/location";
 import {
   missingRequired,
+  parseDates,
   parseProgrammeFields,
   parseStatus
 } from "@/lib/programme-form";
@@ -34,12 +35,15 @@ export async function createProgramme(formData: FormData) {
   const resolved = await resolveLocation(formData, fields);
   if (typeof resolved === "string") fail(resolved);
   const { latitude, longitude } = resolved;
+  const dates = parseDates(formData);
+  if (typeof dates === "string") fail(dates);
 
   const supabase = createClient();
   const { error } = await supabase.from("programmes").insert({
     ...fields,
     latitude,
     longitude,
+    ...dates,
     status: parseStatus(formData),
     is_published: formData.get("is_published") === "on",
     last_verified_at: today()
@@ -57,6 +61,8 @@ export async function updateProgramme(formData: FormData) {
   const resolved = await resolveLocation(formData, fields);
   if (typeof resolved === "string") fail(resolved);
   const { latitude, longitude } = resolved;
+  const dates = parseDates(formData);
+  if (typeof dates === "string") fail(dates);
 
   const supabase = createClient();
   const { error } = await supabase
@@ -65,6 +71,7 @@ export async function updateProgramme(formData: FormData) {
       ...fields,
       latitude,
       longitude,
+      ...dates,
       status: parseStatus(formData),
       ...(formData.get("mark_verified") === "on"
         ? { last_verified_at: today() }

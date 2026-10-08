@@ -8,13 +8,15 @@ export function ProgrammeFieldset({
   status,
   idPrefix,
   latitude,
-  longitude
+  longitude,
+  dates
 }: {
   values?: Partial<ProgrammeFields>;
   status?: ProgrammeStatus;
   idPrefix: string;
   latitude?: number | null;
   longitude?: number | null;
+  dates?: { opening_date: string | null; deadline_date: string | null };
 }) {
   const v = values ?? {};
   const degrees = v.degree_level ?? [];
@@ -60,6 +62,18 @@ export function ProgrammeFieldset({
 
       <Input label="Estimated opening" name="estimated_opening" value={v.estimated_opening} />
       <Input label="Estimated deadline" name="estimated_deadline" value={v.estimated_deadline} />
+      <fieldset className="flex flex-col gap-3 rounded-card border border-border bg-cream p-4 text-sm md:col-span-2">
+        <legend className="px-1 font-medium">Exact dates (optional)</legend>
+        <p className="text-faint">
+          When set, the public status updates by itself: Closed the day after
+          the deadline, Expected before the opening date, Open in between.
+          Leave empty to keep the public status chosen above.
+        </p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input label="Opening date" name="opening_date" type="date" value={dates?.opening_date} />
+          <Input label="Deadline date" name="deadline_date" type="date" value={dates?.deadline_date} />
+        </div>
+      </fieldset>
       <Input label="Academic year" name="academic_year" value={v.academic_year} />
       <Input label="Language" name="language" value={v.language} />
       <Input label="Website" name="website" value={v.website} type="url" />

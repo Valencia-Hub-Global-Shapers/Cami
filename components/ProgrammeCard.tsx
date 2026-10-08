@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { formatDate, isEmail } from "@/lib/format";
 import { Programme } from "@/lib/types";
-import { StatusBadge } from "./StatusBadge";
+import { formatDay } from "@/lib/programme-status";
+import { DeadlineSoon, StatusBadge } from "./StatusBadge";
 
 export function ProgrammeCard({ programme }: { programme: Programme }) {
   const verified = formatDate(programme.last_verified_at);
@@ -33,7 +34,10 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
             {[programme.city, programme.country].filter(Boolean).join(", ")}
           </p>
         </div>
-        <StatusBadge status={programme.status} />
+        <div className="flex flex-col items-end gap-1.5">
+          <StatusBadge status={programme.status} />
+          <DeadlineSoon programme={programme} />
+        </div>
       </div>
 
       {programme.degree_level && programme.degree_level.length > 0 && (
@@ -62,13 +66,17 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
         <div>
           <dt className="label-caps">Opens</dt>
           <dd className="mt-0.5 text-ink">
-            {programme.estimated_opening ?? "Not listed"}
+            {programme.opening_date
+              ? formatDay(programme.opening_date)
+              : programme.estimated_opening ?? "Not listed"}
           </dd>
         </div>
         <div>
           <dt className="label-caps">Deadline</dt>
           <dd className="mt-0.5 text-ink">
-            {programme.estimated_deadline ?? "Not listed"}
+            {programme.deadline_date
+              ? formatDay(programme.deadline_date)
+              : programme.estimated_deadline ?? "Not listed"}
           </dd>
         </div>
         {programme.academic_year && (

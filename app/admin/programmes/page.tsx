@@ -194,6 +194,7 @@ function ProgrammeRow({
             idPrefix={programme.id}
             latitude={programme.latitude}
             longitude={programme.longitude}
+            dates={programme}
           />
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 text-sm">

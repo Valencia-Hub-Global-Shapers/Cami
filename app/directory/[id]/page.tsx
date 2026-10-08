@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedProgramme } from "@/lib/directory";
 import { formatDate, isEmail } from "@/lib/format";
-import { StatusBadge } from "@/components/StatusBadge";
+import { DeadlineSoon, StatusBadge } from "@/components/StatusBadge";
+import { formatDay } from "@/lib/programme-status";
 import { ProgrammeMap } from "./ProgrammeMap";
 
 export const revalidate = 300;
@@ -52,6 +53,7 @@ export default async function ProgrammePage({ params }: Props) {
             {programme.programme_name}
           </h1>
           <StatusBadge status={programme.status} />
+          <DeadlineSoon programme={programme} />
         </div>
         <p className="text-faint">
           {[programme.city, programme.country].filter(Boolean).join(", ")}
@@ -90,13 +92,17 @@ export default async function ProgrammePage({ params }: Props) {
             <div>
               <dt className="label-caps">Opens</dt>
               <dd className="mt-0.5 text-ink">
-                {programme.estimated_opening ?? "Not listed"}
+                {programme.opening_date
+                  ? formatDay(programme.opening_date)
+                  : programme.estimated_opening ?? "Not listed"}
               </dd>
             </div>
             <div>
               <dt className="label-caps">Deadline</dt>
               <dd className="mt-0.5 text-ink">
-                {programme.estimated_deadline ?? "Not listed"}
+                {programme.deadline_date
+                  ? formatDay(programme.deadline_date)
+                  : programme.estimated_deadline ?? "Not listed"}
               </dd>
             </div>
             {programme.academic_year && (
