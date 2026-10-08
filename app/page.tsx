@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getPublishedProgrammes } from "@/lib/directory";
+import { Collaboration } from "@/components/Collaboration";
 import { ProgrammeCard } from "@/components/ProgrammeCard";
 
 export const revalidate = 300; // refresh published listings every 5 minutes
@@ -139,6 +140,7 @@ export default async function HomePage() {
             </Link>
           </p>
         </div>
+        <Collaboration className="md:col-span-2" />
       </section>
     </div>
   );
