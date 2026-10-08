@@ -140,7 +140,7 @@ export default async function HomePage() {
             </Link>
           </p>
         </div>
-        <Collaboration className="md:col-span-2" />
+        <Collaboration compact className="md:col-span-2" />
       </section>
     </div>
   );

@@ -21,7 +21,34 @@ const LOGOS = [
   }
 ];
 
-export function Collaboration({ className = "" }: { className?: string }) {
+export function Collaboration({
+  className = "",
+  compact = false
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
+  if (compact) {
+    return (
+      <div className={className}>
+        <p className="label-caps">A collaboration between</p>
+        <ul className="mt-4 flex flex-wrap items-center gap-x-10 gap-y-4">
+          {LOGOS.map((logo) => (
+            <li key={logo.src}>
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                width={logo.width}
+                height={200}
+                className="h-10 w-auto max-w-[9rem] object-contain opacity-80"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
   return (
     <div className={`rounded-card border border-border bg-white ${className}`}>
       <p className="label-caps border-b border-border px-6 py-4 text-center">
