@@ -84,7 +84,14 @@ export default function RootLayout({
             <Link href="/about" className="text-faint underline hover:text-muted">
               Bridging Futures
             </Link>
-            , Ramallah Hub. Developed by the{" "}
+            ,{" "}
+            <a
+              href="https://linktr.ee/globalshapersramallah"
+              className="text-faint underline hover:text-muted"
+            >
+              Ramallah Hub
+            </a>
+            . Developed by the{" "}
             <a
               href="https://valencia-hub-global-shapers.github.io/?lang=en"
               className="text-faint underline hover:text-muted"
