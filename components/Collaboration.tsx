@@ -32,7 +32,7 @@ export function Collaboration({
     return (
       <div className={className}>
         <p className="label-caps">A collaboration between</p>
-        <ul className="mt-4 flex flex-wrap items-center gap-x-10 gap-y-4">
+        <ul className="mt-4 flex flex-wrap items-center gap-x-12 gap-y-6">
           {LOGOS.map((logo) => (
             <li key={logo.src}>
               <Image
@@ -40,7 +40,7 @@ export function Collaboration({
                 alt={logo.alt}
                 width={logo.width}
                 height={200}
-                className="h-10 w-auto max-w-[9rem] object-contain opacity-80"
+                className="h-16 w-auto max-w-[12rem] object-contain sm:h-20"
               />
             </li>
           ))}
