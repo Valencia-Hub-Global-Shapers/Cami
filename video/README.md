@@ -1,6 +1,6 @@
 # Camí showcase video
 
-A 1:44 horizontal (1920x1080, 30 fps) showcase of Camí for the event with the
+A 1:27 horizontal (1920x1080, 30 fps) showcase of Camí for the event with the
 Global Shapers Ramallah Hub. No voiceover, an original score.
 
 **The finished video:** [`out/cami-showcase.mp4`](out/cami-showcase.mp4)
@@ -33,8 +33,8 @@ npm install
 ./music/master.sh                 # needs python3 with numpy and scipy, and ffmpeg
 npx remotion studio src/index.ts  # preview
 npx remotion render src/index.ts Main out/render-1x.mp4 --codec=h264 --crf=16 --audio-bitrate=320k
-# the delivered cut plays at 1.25x (2:10 -> 1:44), music pitch kept
-ffmpeg -i out/render-1x.mp4 -filter_complex "[0:v]setpts=PTS/1.25,fps=30[v];[0:a]atempo=1.25[a]" \
+# the delivered cut plays at 1.5x (2:10 -> 1:27), music pitch kept
+ffmpeg -i out/render-1x.mp4 -filter_complex "[0:v]setpts=PTS/1.5,fps=30[v];[0:a]atempo=1.5[a]" \
   -map "[v]" -map "[a]" -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p \
   -c:a aac -b:a 256k -movflags +faststart out/cami-showcase.mp4
 ```
