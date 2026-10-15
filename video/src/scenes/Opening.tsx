@@ -87,9 +87,12 @@ const FRAGMENTS = [
 const fragmentSpot = (i: number) => {
   const top = i % 2 === 0;
   const col = Math.floor(i / 2);
-  const x = 110 + col * 300 + random(`fx${i}`) * 120;
-  const y = top ? 90 + random(`fy${i}`) * 230 : 760 + random(`fy${i}`) * 200;
-  return { x, y, rot: (random(`fr${i}`) - 0.5) * 8, drift: 0.3 + random(`fd${i}`) * 0.5 };
+  // Neighbouring columns sit on alternate heights and every scrap in a row
+  // drifts at the same speed, so no two ever run into each other.
+  const x = 110 + col * 300 + random(`fx${i}`) * 60;
+  const lane = (col % 2) * 130 + random(`fy${i}`) * 40;
+  const y = top ? 90 + lane : 770 + lane;
+  return { x, y, rot: (random(`fr${i}`) - 0.5) * 8, drift: 0.25 };
 };
 
 // The context: the serious part, on ink. Global frames (this sits in a
@@ -139,7 +142,7 @@ const Fragments = ({ g }: { g: number }) => {
         const s = fragmentSpot(i);
         const show = enter(g, 420 + i * 9, 30);
         const dim = lerp(enter(g, 600, 40), 1, 0.35);
-        const x = s.x + (g - 400) * s.drift * (i % 2 === 0 ? 1 : -1) * 0.6;
+        const x = s.x + (g - 400) * s.drift * (i % 2 === 0 ? 1 : -1);
         const y = s.y + Math.sin((g + i * 40) / 60) * 6;
         const gx = lerp(gather, x, 960 - 80);
         const gy = lerp(gather, y, 540 - 20);
@@ -215,7 +218,7 @@ export const Reveal = () => {
       }}
     >
       <div style={{ ...rise(g, 972), fontFamily: serif, fontStyle: 'italic', fontSize: 36, color: faint }}>
-        Catalan for “path”
+        Valencian for “path”
       </div>
       <div style={{ ...rise(g, 996), fontFamily: sans, fontSize: 30, color, marginTop: 22 }}>
         One directory of university admission and scholarship programmes for Palestinian students.

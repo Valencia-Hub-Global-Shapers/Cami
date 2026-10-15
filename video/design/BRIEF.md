@@ -35,7 +35,7 @@ carried transitions, an original score timed to the picture, a QC pass).
 | 0:07 | Context 1 | "Universities around the world open places and scholarships for Palestinian students." |
 | 0:13 | Context 2 | "But the information is scattered, and it changes every academic year." Fragments drift. |
 | 0:20 | Context 3 | "Finding the right path should not be one more barrier." |
-| 0:27 | The turn | Fragments gather into the mark. "Camí". "Catalan for path." |
+| 0:27 | The turn | Fragments gather into the mark. "Camí". "Valencian for path." |
 | 0:37 | Directory | "Every programme in one place." Cards with what each covers and when. |
 | 0:47 | Filters | "Find the programmes that fit." Country, degree level, status. |
 | 0:57 | Map | "See where each opportunity is." |

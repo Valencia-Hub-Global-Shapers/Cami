@@ -10,7 +10,7 @@ const CX = 1250;
 const CY = 520;
 const HUBS = Array.from({ length: 8 }, (_, i) => {
   const ang = (-90 + i * 45 + 22.5) * (Math.PI / 180);
-  return { x: CX + Math.cos(ang) * 230, y: CY + Math.sin(ang) * 230, label: i === 6 ? 'Ramallah' : i === 7 ? 'Valencia' : '' };
+  return { x: CX + Math.cos(ang) * 230, y: CY + Math.sin(ang) * 230 };
 });
 const STUDENTS = Array.from({ length: 14 }, (_, i) => {
   const ang = (-90 + i * (360 / 14)) * (Math.PI / 180);
@@ -79,26 +79,6 @@ export const Possibilities = ({ offset }: { offset: number }) => {
           return <circle key={i} cx={s.x} cy={s.y} r={10 * t} fill={c.route} />;
         })}
       </svg>
-      {HUBS.filter((h) => h.label).map((h) => (
-        <div
-          key={h.label}
-          style={{
-            position: 'absolute',
-            left: h.x - 120,
-            top: h.y - 54,
-            width: 240,
-            display: 'flex',
-            justifyContent: 'center',
-            fontFamily: sans,
-            fontSize: 18,
-            fontWeight: 500,
-            color: c.muted,
-            opacity: enter(g, 2990, 20),
-          }}
-        >
-          <span style={{ background: c.cream, borderRadius: 999, padding: '2px 12px' }}>{h.label}</span>
-        </div>
-      ))}
       <div
         style={{
           position: 'absolute',
