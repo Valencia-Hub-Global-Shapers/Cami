@@ -1,0 +1,241 @@
+import React from 'react';
+import { AbsoluteFill, Img, random, staticFile, useCurrentFrame } from 'remotion';
+import { c, sans, serif } from '../look';
+import { T } from '../timing';
+import { LabelCaps } from '../ui/Base';
+import { LOCKUP, LOCKUP_X, Lockup } from '../ui/App';
+import { enter, glide, leave, lerp, rise } from '../ui/motion';
+
+// 0:00 Global Shapers Valencia Hub presents. Calm, on cream.
+export const Presents = () => {
+  const f = useCurrentFrame();
+  const out = leave(f, 168, 30);
+  const logo = enter(f, 8, 40);
+  return (
+    <AbsoluteFill
+      style={{
+        background: c.cream,
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 1 - out * 0.6,
+        transform: `translateY(${-out * 60}px)`,
+      }}
+    >
+      <Img
+        src={staticFile('logos/global-shapers-valencia.png')}
+        style={{
+          height: 230,
+          opacity: logo,
+          transform: `scale(${lerp(logo, 0.96, 1)})`,
+        }}
+      />
+      <div style={{ ...rise(f, 34), marginTop: 44 }}>
+        <LabelCaps size={22} color={c.muted} style={{ letterSpacing: 5 }}>
+          Global Shapers Valencia Hub
+        </LabelCaps>
+      </div>
+      <div
+        style={{
+          ...rise(f, 58),
+          marginTop: 16,
+          fontFamily: serif,
+          fontStyle: 'italic',
+          fontSize: 44,
+          color: c.ink,
+        }}
+      >
+        presents
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const LINES = [
+  {
+    from: 215,
+    to: 395,
+    text: 'Universities around the world open places and scholarships for Palestinian students.',
+  },
+  {
+    from: 415,
+    to: 595,
+    text: 'But the information is scattered, and it changes every academic year.',
+  },
+  {
+    from: 615,
+    to: 790,
+    text: 'Finding the right path should not be one more barrier.',
+  },
+];
+
+const FRAGMENTS = [
+  'Admissions 2027-2028',
+  'Deadline: to be confirmed',
+  'Scholarship call (PDF)',
+  'Fwd: is this still open?',
+  'Requirements may change',
+  'Language certificate?',
+  'Call closed',
+  'Documents required: see annex',
+  'Next call: unknown',
+  'Link not found',
+  'Eligibility criteria',
+  'Expected in July?',
+];
+
+// Where each fragment drifts, kept out of the central text band.
+const fragmentSpot = (i: number) => {
+  const top = i % 2 === 0;
+  const col = Math.floor(i / 2);
+  const x = 110 + col * 300 + random(`fx${i}`) * 120;
+  const y = top ? 90 + random(`fy${i}`) * 230 : 760 + random(`fy${i}`) * 200;
+  return { x, y, rot: (random(`fr${i}`) - 0.5) * 8, drift: 0.3 + random(`fd${i}`) * 0.5 };
+};
+
+// The context: the serious part, on ink. Global frames (this sits in a
+// Sequence from T.context.from - 30, so local + offset = global).
+export const Context = ({ offset }: { offset: number }) => {
+  const g = useCurrentFrame() + offset;
+  const ground = glide(g, 170, 44);
+  return (
+    <AbsoluteFill>
+      <AbsoluteFill
+        style={{
+          background: c.ink,
+          transform: `translateY(${(1 - ground) * 1080}px)`,
+          borderTopLeftRadius: (1 - ground) * 600,
+          borderTopRightRadius: (1 - ground) * 600,
+        }}
+      />
+      <Fragments g={g} />
+      {LINES.map((l) => (
+        <AbsoluteFill key={l.from} style={{ alignItems: 'center', justifyContent: 'center', padding: '0 240px' }}>
+          <div
+            style={{
+              ...rise(g, l.from, l.to, 30),
+              fontFamily: serif,
+              fontSize: 64,
+              lineHeight: 1.22,
+              textAlign: 'center',
+              color: c.cream,
+              maxWidth: 1360,
+            }}
+          >
+            {l.text}
+          </div>
+        </AbsoluteFill>
+      ))}
+    </AbsoluteFill>
+  );
+};
+
+// Scraps of information, scattered. At the turn they gather into the mark.
+const Fragments = ({ g }: { g: number }) => {
+  if (g < 400 || g > 880) return null;
+  const gather = glide(g, 800, 50);
+  return (
+    <AbsoluteFill>
+      {FRAGMENTS.map((text, i) => {
+        const s = fragmentSpot(i);
+        const show = enter(g, 420 + i * 9, 30);
+        const dim = lerp(enter(g, 600, 40), 1, 0.35);
+        const x = s.x + (g - 400) * s.drift * (i % 2 === 0 ? 1 : -1) * 0.6;
+        const y = s.y + Math.sin((g + i * 40) / 60) * 6;
+        const gx = lerp(gather, x, 960 - 80);
+        const gy = lerp(gather, y, 540 - 20);
+        return (
+          <div
+            key={text}
+            style={{
+              position: 'absolute',
+              left: gx,
+              top: gy,
+              opacity: show * dim * (1 - enter(g, 830, 20)),
+              transform: `rotate(${s.rot * (1 - gather)}deg) scale(${1 - gather * 0.85})`,
+              background: c.inkSoft,
+              border: '1px solid #3B362E',
+              borderRadius: 10,
+              padding: '12px 18px',
+              fontFamily: sans,
+              fontSize: 20,
+              color: '#A79E8D',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {text}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+// 0:27 The turn: the scraps gather into the mark, the path draws, and the
+// light arrives from the green point.
+export const Reveal = () => {
+  const f = useCurrentFrame();
+  const g = f + T.reveal.from;
+  const dots = enter(g, 822, 30);
+  const draw = glide(g, 846, 40);
+  const slide = glide(g, 892, 34);
+  const word = enter(g, 906, 30);
+  const light = glide(g, 952, 52);
+  const subOut = leave(g, 1046, 14);
+
+  // The mark sits centred, then slides into its place in the lockup.
+  const lockLeft = lerp(slide, 960 - LOCKUP.mark / 2, LOCKUP_X);
+  const greenX = lockLeft + LOCKUP.mark * (5 / 30);
+  const hidden = g >= T.app.from - 40;
+
+  const lockup = (color: string) => (
+    <div
+      style={{
+        position: 'absolute',
+        left: lockLeft,
+        top: 540 - LOCKUP.mark / 2,
+        height: LOCKUP.mark,
+        opacity: hidden ? 0 : dots,
+        transform: `scale(${dots < 1 ? lerp(dots, 0.6, 1) : 1})`,
+        transformOrigin: `${LOCKUP.mark / 2}px center`,
+      }}
+    >
+      <Lockup color={color} draw={draw} textOpacity={word} />
+    </div>
+  );
+
+  const sub = (color: string, faint: string) => (
+    <div
+      style={{
+        position: 'absolute',
+        top: 680,
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        opacity: 1 - subOut,
+      }}
+    >
+      <div style={{ ...rise(g, 972), fontFamily: serif, fontStyle: 'italic', fontSize: 36, color: faint }}>
+        Catalan for “path”
+      </div>
+      <div style={{ ...rise(g, 996), fontFamily: sans, fontSize: 30, color, marginTop: 22 }}>
+        One directory of university admission and scholarship programmes for Palestinian students.
+      </div>
+    </div>
+  );
+
+  const r = light * 2300;
+  return (
+    <AbsoluteFill style={{ background: c.ink }}>
+      {lockup(c.cream)}
+      <AbsoluteFill
+        style={{
+          background: c.cream,
+          clipPath: `circle(${r}px at ${greenX + LOCKUP.mark * 0}px 540px)`,
+        }}
+      >
+        {lockup(c.ink)}
+        {sub(c.muted, c.faint)}
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};

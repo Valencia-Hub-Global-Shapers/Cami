@@ -1,0 +1,4 @@
+node_modules
+out/*
+!out/cami-showcase.mp4
+music/__pycache__
