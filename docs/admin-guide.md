@@ -201,3 +201,4 @@ answer.
 | "This account is signed in but is not an admin yet" | Step 2 was not done, or the email did not match | Run step 3 to check, then step 2 again |
 | Admin pages open but show nothing, or actions fail | Migration `0002_admin_helpers.sql` was not run | Run it in the SQL Editor |
 | Saving a programme fails with a message about `latitude` | Migration `0003_programme_location.sql` was not run | Run it in the SQL Editor |
+| The submit form says "Something went wrong submitting this" and Supabase's Postgres logs show `new row violates row-level security policy for table "submissions"` | The public insert policy on `submissions` is missing or altered | Run `0005_submission_insert_policy.sql` in the SQL Editor |

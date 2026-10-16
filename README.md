@@ -11,13 +11,16 @@ Vercel.
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Open the SQL editor and run the files in `supabase/migrations/` in
    order: `0001_init.sql`, `0002_admin_helpers.sql`,
-   `0003_programme_location.sql`. The first creates all four
+   `0003_programme_location.sql`, `0004_programme_dates.sql`,
+   `0005_submission_insert_policy.sql`. The first creates all four
    tables (`programmes`, `internal_assessments`, `submissions`, `profiles`)
    and their Row Level Security policies. The second is required: it fixes
    the admin policies (without it every admin query fails with "infinite
    recursion detected in policy"), keeps `updated_at` current, and adds the
    `approve_submission` function that publishes a submission in a single
-   transaction. The third adds map coordinates to programmes.
+   transaction. The third adds map coordinates to programmes, the fourth
+   exact opening and deadline dates, and the fifth makes sure anyone can
+   send a submission without signing in.
 3. Run `supabase/seed/0001_programmes.sql` to load the five known
    programmes as published entries, with their internal triage scores.
 4. Go to **Authentication > Providers** and confirm Email is enabled
