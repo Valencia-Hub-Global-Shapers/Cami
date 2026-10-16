@@ -24,8 +24,16 @@ export type ProgrammeFields = {
   [K in (typeof TEXT_FIELDS)[number]]: string | null;
 } & { degree_level: string[] | null };
 
-function text(formData: FormData, name: string): string | null {
-  return String(formData.get(name) ?? "").trim() || null;
+// Text pasted from PDFs can carry NUL and other control characters, which
+// Postgres rejects in text columns. Tabs and line breaks are kept.
+const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+
+export function text(formData: FormData, name: string): string | null {
+  return (
+    String(formData.get(name) ?? "")
+      .replace(CONTROL_CHARS, "")
+      .trim() || null
+  );
 }
 
 export function parseProgrammeFields(formData: FormData): ProgrammeFields {
