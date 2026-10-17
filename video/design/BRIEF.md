@@ -12,8 +12,8 @@ carried transitions, an original score timed to the picture, a QC pass).
   Palestinian students in one checked, shared place, and every hub can help it
   grow.
 - **Tone:** professional and serious, with quiet hope. No voiceover. Music only.
-- **Credit:** opens with "Global Shapers Valencia Hub presents". After that the
-  platform is the subject. The end card credits the collaboration: Bridging
+- **Credit:** opens on the Camí logo, so the platform is the subject from the
+  first frame. The end card credits the collaboration: Bridging
   Futures (the initiative), Ramallah Hub (leads it), Valencia Hub (built Camí).
 
 ## Look
@@ -31,7 +31,7 @@ carried transitions, an original score timed to the picture, a QC pass).
 
 | Time | Beat | On screen |
 |---|---|---|
-| 0:00 | Presents | Valencia Hub logo. "Global Shapers Valencia Hub presents" |
+| 0:00 | Opening | The Camí logo: the mark draws its path, then the name. |
 | 0:07 | Context 1 | "Universities around the world open places and scholarships for Palestinian students." |
 | 0:13 | Context 2 | "But the information is scattered, and it changes every academic year." Fragments drift. |
 | 0:20 | Context 3 | "Finding the right path should not be one more barrier." |

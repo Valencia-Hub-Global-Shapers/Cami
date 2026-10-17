@@ -1,50 +1,39 @@
 import React from 'react';
-import { AbsoluteFill, Img, random, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, random, useCurrentFrame } from 'remotion';
 import { c, sans, serif, useLayout } from '../look';
 import { T } from '../timing';
-import { LabelCaps } from '../ui/Base';
 import { LOCKUP, Lockup, lockupX } from '../ui/App';
 import { enter, glide, leave, lerp, rise } from '../ui/motion';
 
-// 0:00 Global Shapers Valencia Hub presents. Calm, on cream.
+// 0:00 The Camí logo: the mark draws its path, then the name settles in.
 export const Presents = () => {
   const f = useCurrentFrame();
+  const { cx, cy } = useLayout();
   const out = leave(f, 168, 30);
-  const logo = enter(f, 8, 40);
+  const dots = enter(f, 8, 30);
+  const draw = glide(f, 24, 40);
+  const word = enter(f, 52, 34);
+  const S = 0.8;
   return (
     <AbsoluteFill
       style={{
         background: c.cream,
-        alignItems: 'center',
-        justifyContent: 'center',
         opacity: 1 - out * 0.6,
         transform: `translateY(${-out * 60}px)`,
       }}
     >
-      <Img
-        src={staticFile('logos/global-shapers-valencia.png')}
-        style={{
-          height: 230,
-          opacity: logo,
-          transform: `scale(${lerp(logo, 0.96, 1)})`,
-        }}
-      />
-      <div style={{ ...rise(f, 34), marginTop: 44 }}>
-        <LabelCaps size={22} color={c.muted} style={{ letterSpacing: 5 }}>
-          Global Shapers Valencia Hub
-        </LabelCaps>
-      </div>
       <div
         style={{
-          ...rise(f, 58),
-          marginTop: 16,
-          fontFamily: serif,
-          fontStyle: 'italic',
-          fontSize: 44,
-          color: c.ink,
+          position: 'absolute',
+          left: cx - (LOCKUP.width * S) / 2,
+          top: cy - LOCKUP.mark / 2,
+          height: LOCKUP.mark,
+          opacity: dots,
+          transform: `scale(${S * lerp(dots, 0.94, 1)})`,
+          transformOrigin: 'left center',
         }}
       >
-        presents
+        <Lockup color={c.ink} draw={draw} textOpacity={word} />
       </div>
     </AbsoluteFill>
   );
