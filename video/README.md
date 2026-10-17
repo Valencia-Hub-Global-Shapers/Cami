@@ -3,7 +3,10 @@
 A 1:27 horizontal (1920x1080, 30 fps) showcase of Camí for the event with the
 Global Shapers Ramallah Hub. No voiceover, an original score.
 
-**The finished video:** [`out/cami-showcase.mp4`](out/cami-showcase.mp4)
+**The finished videos:**
+- Horizontal 16:9: [`out/cami-showcase.mp4`](out/cami-showcase.mp4)
+- Vertical 9:16: [`out/cami-showcase-vertical.mp4`](out/cami-showcase-vertical.mp4)
+  (the `Vertical` composition: same scenes, laid out for phones)
 
 The brief, look and script are in [`design/BRIEF.md`](design/BRIEF.md). It was
 made with the method of [Mortiflix](https://github.com/GTKottman/mortiflix-oss):
@@ -37,6 +40,8 @@ npx remotion render src/index.ts Main out/render-1x.mp4 --codec=h264 --crf=16 --
 ffmpeg -i out/render-1x.mp4 -filter_complex "[0:v]setpts=PTS/1.5,fps=30[v];[0:a]atempo=1.5[a]" \
   -map "[v]" -map "[a]" -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p \
   -c:a aac -b:a 256k -movflags +faststart out/cami-showcase.mp4
+# vertical: render the Vertical composition, then the same speed-up
+npx remotion render src/index.ts Vertical out/vertical-1x.mp4 --codec=h264 --crf=16 --audio-bitrate=320k
 ```
 
 Remotion is free for individuals and small non-profit teams; check its licence

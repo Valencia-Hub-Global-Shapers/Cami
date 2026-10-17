@@ -3,3 +3,4 @@ out/*
 !out/cami-showcase.mp4
 music/__pycache__
 checks
+!out/cami-showcase-vertical.mp4
