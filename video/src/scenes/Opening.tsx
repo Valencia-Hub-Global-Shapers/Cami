@@ -1,9 +1,9 @@
 import React from 'react';
 import { AbsoluteFill, Img, random, staticFile, useCurrentFrame } from 'remotion';
-import { c, sans, serif } from '../look';
+import { c, sans, serif, useLayout } from '../look';
 import { T } from '../timing';
 import { LabelCaps } from '../ui/Base';
-import { LOCKUP, LOCKUP_X, Lockup } from '../ui/App';
+import { LOCKUP, Lockup, lockupX } from '../ui/App';
 import { enter, glide, leave, lerp, rise } from '../ui/motion';
 
 // 0:00 Global Shapers Valencia Hub presents. Calm, on cream.
@@ -84,11 +84,16 @@ const FRAGMENTS = [
 ];
 
 // Where each fragment drifts, kept out of the central text band.
-const fragmentSpot = (i: number) => {
+const fragmentSpot = (i: number, vertical: boolean) => {
   const top = i % 2 === 0;
   const col = Math.floor(i / 2);
-  // Neighbouring columns sit on alternate heights and every scrap in a row
+  // Neighbouring scraps sit on alternate heights and every scrap in a row
   // drifts at the same speed, so no two ever run into each other.
+  if (vertical) {
+    const x = 70 + (col % 2) * 470 + random(`fx${i}`) * 50;
+    const y = (top ? 170 : 1290) + Math.floor(col / 2) * 160 + (col % 2) * 70;
+    return { x, y, rot: (random(`fr${i}`) - 0.5) * 8, drift: 0.2 };
+  }
   const x = 110 + col * 300 + random(`fx${i}`) * 60;
   const lane = (col % 2) * 130 + random(`fy${i}`) * 40;
   const y = top ? 90 + lane : 770 + lane;
@@ -99,25 +104,26 @@ const fragmentSpot = (i: number) => {
 // Sequence from T.context.from - 30, so local + offset = global).
 export const Context = ({ offset }: { offset: number }) => {
   const g = useCurrentFrame() + offset;
+  const { H, V } = useLayout();
   const ground = glide(g, 170, 44);
   return (
     <AbsoluteFill>
       <AbsoluteFill
         style={{
           background: c.ink,
-          transform: `translateY(${(1 - ground) * 1080}px)`,
+          transform: `translateY(${(1 - ground) * H}px)`,
           borderTopLeftRadius: (1 - ground) * 600,
           borderTopRightRadius: (1 - ground) * 600,
         }}
       />
       <Fragments g={g} />
       {LINES.map((l) => (
-        <AbsoluteFill key={l.from} style={{ alignItems: 'center', justifyContent: 'center', padding: '0 240px' }}>
+        <AbsoluteFill key={l.from} style={{ alignItems: 'center', justifyContent: 'center', padding: V ? '0 90px' : '0 240px' }}>
           <div
             style={{
               ...rise(g, l.from, l.to, 30),
               fontFamily: serif,
-              fontSize: 64,
+              fontSize: V ? 66 : 64,
               lineHeight: 1.22,
               textAlign: 'center',
               color: c.cream,
@@ -136,16 +142,17 @@ export const Context = ({ offset }: { offset: number }) => {
 const Fragments = ({ g }: { g: number }) => {
   if (g < 400 || g > 880) return null;
   const gather = glide(g, 800, 50);
+  const { cx, cy, V } = useLayout();
   return (
     <AbsoluteFill>
       {FRAGMENTS.map((text, i) => {
-        const s = fragmentSpot(i);
+        const s = fragmentSpot(i, V);
         const show = enter(g, 420 + i * 9, 30);
         const dim = lerp(enter(g, 600, 40), 1, 0.35);
         const x = s.x + (g - 400) * s.drift * (i % 2 === 0 ? 1 : -1);
         const y = s.y + Math.sin((g + i * 40) / 60) * 6;
-        const gx = lerp(gather, x, 960 - 80);
-        const gy = lerp(gather, y, 540 - 20);
+        const gx = lerp(gather, x, cx - 80);
+        const gy = lerp(gather, y, cy - 20);
         return (
           <div
             key={text}
@@ -184,9 +191,10 @@ export const Reveal = () => {
   const word = enter(g, 906, 30);
   const light = glide(g, 952, 52);
   const subOut = leave(g, 1046, 14);
+  const { W, cx, cy, V } = useLayout();
 
   // The mark sits centred, then slides into its place in the lockup.
-  const lockLeft = lerp(slide, 960 - LOCKUP.mark / 2, LOCKUP_X);
+  const lockLeft = lerp(slide, cx - LOCKUP.mark / 2, lockupX(W));
   const greenX = lockLeft + LOCKUP.mark * (5 / 30);
   const hidden = g >= T.app.from - 40;
 
@@ -195,7 +203,7 @@ export const Reveal = () => {
       style={{
         position: 'absolute',
         left: lockLeft,
-        top: 540 - LOCKUP.mark / 2,
+        top: cy - LOCKUP.mark / 2,
         height: LOCKUP.mark,
         opacity: hidden ? 0 : dots,
         transform: `scale(${dots < 1 ? lerp(dots, 0.6, 1) : 1})`,
@@ -210,9 +218,9 @@ export const Reveal = () => {
     <div
       style={{
         position: 'absolute',
-        top: 680,
-        left: 0,
-        right: 0,
+        top: cy + 140,
+        left: V ? 90 : 0,
+        right: V ? 90 : 0,
         textAlign: 'center',
         opacity: 1 - subOut,
       }}
@@ -220,7 +228,7 @@ export const Reveal = () => {
       <div style={{ ...rise(g, 972), fontFamily: serif, fontStyle: 'italic', fontSize: 36, color: faint }}>
         Valencian for “path”
       </div>
-      <div style={{ ...rise(g, 996), fontFamily: sans, fontSize: 30, color, marginTop: 22 }}>
+      <div style={{ ...rise(g, 996), fontFamily: sans, fontSize: V ? 36 : 30, lineHeight: 1.4, color, marginTop: 22 }}>
         One directory of university admission and scholarship programmes for Palestinian students.
       </div>
     </div>
@@ -233,7 +241,7 @@ export const Reveal = () => {
       <AbsoluteFill
         style={{
           background: c.cream,
-          clipPath: `circle(${r}px at ${greenX + LOCKUP.mark * 0}px 540px)`,
+          clipPath: `circle(${r}px at ${greenX}px ${cy}px)`,
         }}
       >
         {lockup(c.ink)}

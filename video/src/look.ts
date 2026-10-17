@@ -1,3 +1,5 @@
+import { useVideoConfig } from 'remotion';
+
 // The look, taken from the app (tailwind.config.ts). Every scene reads from here.
 export const video = {
   width: 1920,
@@ -25,3 +27,9 @@ export const sans = '"IBM Plex Sans", system-ui, sans-serif';
 
 // Title-safe margin (5% of width) for every caption.
 export const SAFE_X = 120;
+
+// The frame this render is for: the same scenes lay out for 16:9 and 9:16.
+export const useLayout = () => {
+  const { width, height } = useVideoConfig();
+  return { W: width, H: height, V: height > width, cx: width / 2, cy: height / 2 };
+};

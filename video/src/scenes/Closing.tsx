@@ -1,20 +1,24 @@
 import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from 'remotion';
-import { c, sans, serif, SAFE_X } from '../look';
+import { c, sans, serif, SAFE_X, useLayout } from '../look';
 import { T } from '../timing';
 import { LabelCaps, Mark } from '../ui/Base';
 import { LOCKUP, Lockup } from '../ui/App';
 import { enter, glide, leave, lerp, rise } from '../ui/motion';
 
-const CX = 1250;
-const CY = 520;
-const HUBS = Array.from({ length: 8 }, (_, i) => {
-  const ang = (-90 + i * 45 + 22.5) * (Math.PI / 180);
-  return { x: CX + Math.cos(ang) * 230, y: CY + Math.sin(ang) * 230 };
-});
-const STUDENTS = Array.from({ length: 14 }, (_, i) => {
-  const ang = (-90 + i * (360 / 14)) * (Math.PI / 180);
-  return { x: CX + Math.cos(ang) * 400, y: CY + Math.sin(ang) * 380 };
+// The network's centre: beside the text (16:9) or under it (9:16). The
+// browser shrinks onto this point at the end of the showcase.
+const centre = (V: boolean) => (V ? { CX: 540, CY: 1290 } : { CX: 1250, CY: 520 });
+
+const nodes = (CX: number, CY: number) => ({
+  HUBS: Array.from({ length: 8 }, (_, i) => {
+    const ang = (-90 + i * 45 + 22.5) * (Math.PI / 180);
+    return { x: CX + Math.cos(ang) * 230, y: CY + Math.sin(ang) * 230 };
+  }),
+  STUDENTS: Array.from({ length: 14 }, (_, i) => {
+    const ang = (-90 + i * (360 / 14)) * (Math.PI / 180);
+    return { x: CX + Math.cos(ang) * 400, y: CY + Math.sin(ang) * 380 };
+  }),
 });
 
 const POINTS = [
@@ -60,9 +64,12 @@ export const Possibilities = ({ offset }: { offset: number }) => {
   const g = useCurrentFrame() + offset;
   const out = leave(g, 3370, 30);
   const node = enter(g, 2905, 30);
+  const { W, H, V } = useLayout();
+  const { CX, CY } = centre(V);
+  const { HUBS, STUDENTS } = nodes(CX, CY);
   return (
     <AbsoluteFill style={{ opacity: 1 - out }}>
-      <svg width={1920} height={1080} style={{ position: 'absolute' }}>
+      <svg width={W} height={H} style={{ position: 'absolute' }}>
         {HUBS.map((h, i) => (
           <Route key={i} x1={h.x} y1={h.y} x2={CX} y2={CY} t={glide(g, 2940 + i * 7, 30)} color={c.terracotta} g={g} phase={i * 23} />
         ))}
@@ -102,13 +109,13 @@ export const Possibilities = ({ offset }: { offset: number }) => {
         style={{
           position: 'absolute',
           left: CX - 330,
-          top: 975,
+          top: V ? 1740 : 975,
           width: 660,
           display: 'flex',
           justifyContent: 'center',
           gap: 40,
           fontFamily: sans,
-          fontSize: 19,
+          fontSize: V ? 23 : 19,
           color: c.muted,
           opacity: enter(g, 3120, 24),
         }}
@@ -121,9 +128,9 @@ export const Possibilities = ({ offset }: { offset: number }) => {
         </span>
       </div>
 
-      <div style={{ position: 'absolute', left: SAFE_X, top: 250, width: 560 }}>
+      <div style={{ position: 'absolute', left: V ? 110 : SAFE_X, top: V ? 260 : 250, width: V ? 860 : 560 }}>
         <div style={rise(g, 2915)}>
-          <LabelCaps size={17} color={c.route} style={{ letterSpacing: 3 }}>
+          <LabelCaps size={V ? 21 : 17} color={c.route} style={{ letterSpacing: 3 }}>
             What it opens up
           </LabelCaps>
         </div>
@@ -132,7 +139,7 @@ export const Possibilities = ({ offset }: { offset: number }) => {
             ...rise(g, 2925),
             fontFamily: serif,
             fontWeight: 600,
-            fontSize: 54,
+            fontSize: V ? 64 : 54,
             lineHeight: 1.12,
             color: c.ink,
             marginTop: 20,
@@ -146,7 +153,7 @@ export const Possibilities = ({ offset }: { offset: number }) => {
               <div style={{ marginTop: 2, flexShrink: 0 }}>
                 <Mark size={34} draw={glide(g, p.at + 6, 20)} />
               </div>
-              <div style={{ fontFamily: sans, fontSize: 25, lineHeight: 1.45, color: c.muted }}>{p.text}</div>
+              <div style={{ fontFamily: sans, fontSize: V ? 30 : 25, lineHeight: 1.45, color: c.muted }}>{p.text}</div>
             </div>
           ))}
         </div>
@@ -168,11 +175,24 @@ export const End = () => {
   const g = useCurrentFrame() + T.end.from;
   const lineOut = leave(g, 3522, 24);
   const words = CLOSING.split(' ');
-  const S = 0.42;
+  const { cx, V } = useLayout();
+  const S = V ? 0.6 : 0.42;
+  // 9:16 stacks the end card around the middle of the frame.
+  const y = V
+    ? { lockup: 560, text: 680, collab: 1010, gap: 46, logo: 150 }
+    : { lockup: 230, text: 330, collab: 590, gap: 110, logo: 170 };
   return (
     <AbsoluteFill style={{ background: c.cream }}>
-      <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 - lineOut, transform: `translateY(${-lineOut * 30}px)` }}>
-        <div style={{ fontFamily: serif, fontSize: 66, color: c.ink, textAlign: 'center', maxWidth: 1400, lineHeight: 1.2 }}>
+      <AbsoluteFill
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: V ? '0 80px' : 0,
+          opacity: 1 - lineOut,
+          transform: `translateY(${-lineOut * 30}px)`,
+        }}
+      >
+        <div style={{ fontFamily: serif, fontSize: V ? 76 : 66, color: c.ink, textAlign: 'center', maxWidth: V ? 920 : 1400, lineHeight: 1.2 }}>
           {words.map((w, i) => {
             const t = enter(g, 3412 + i * 5, 26);
             const key = w === 'path';
@@ -198,8 +218,8 @@ export const End = () => {
       <div
         style={{
           position: 'absolute',
-          left: 960 - (LOCKUP.width * S) / 2,
-          top: 230 - (LOCKUP.mark * S) / 2,
+          left: cx - (LOCKUP.width * S) / 2,
+          top: y.lockup - LOCKUP.mark / 2,
           height: LOCKUP.mark,
           transform: `scale(${S})`,
           transformOrigin: 'left center',
@@ -208,8 +228,8 @@ export const End = () => {
       >
         <Lockup color={c.ink} draw={glide(g, 3550, 36)} />
       </div>
-      <div style={{ position: 'absolute', top: 330, left: 0, right: 0, textAlign: 'center' }}>
-        <div style={{ ...rise(g, 3572), fontFamily: sans, fontSize: 28, color: c.muted }}>
+      <div style={{ position: 'absolute', top: y.text, left: V ? 90 : 0, right: V ? 90 : 0, textAlign: 'center' }}>
+        <div style={{ ...rise(g, 3572), fontFamily: sans, fontSize: V ? 34 : 28, lineHeight: 1.4, color: c.muted }}>
           University admission and scholarship programmes for Palestinian students.
         </div>
         <div style={{ ...rise(g, 3586), marginTop: 26 }}>
@@ -221,7 +241,7 @@ export const End = () => {
               padding: '10px 30px',
               fontFamily: sans,
               fontWeight: 500,
-              fontSize: 28,
+              fontSize: V ? 32 : 28,
               color: c.terracotta,
             }}
           >
@@ -230,21 +250,21 @@ export const End = () => {
         </div>
       </div>
 
-      <div style={{ position: 'absolute', top: 590, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ position: 'absolute', top: y.collab, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ ...rise(g, 3614), display: 'flex', alignItems: 'center', gap: 24 }}>
-          <div style={{ width: 120, height: 1, background: c.border }} />
-          <LabelCaps size={17} style={{ letterSpacing: 4 }}>
+          <div style={{ width: V ? 80 : 120, height: 1, background: c.border }} />
+          <LabelCaps size={V ? 20 : 17} style={{ letterSpacing: 4 }}>
             A collaboration between
           </LabelCaps>
-          <div style={{ width: 120, height: 1, background: c.border }} />
+          <div style={{ width: V ? 80 : 120, height: 1, background: c.border }} />
         </div>
-        <div style={{ display: 'flex', gap: 110, marginTop: 44, alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: y.gap, marginTop: 44, alignItems: 'flex-start' }}>
           {LOGOS.map((l, i) => (
             <div key={l.file} style={{ ...rise(g, 3632 + i * 14), display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
-              <div style={{ height: 170, display: 'flex', alignItems: 'center' }}>
-                <Img src={staticFile(`logos/${l.file}`)} style={{ height: 170, width: (l.w * 170) / 200 }} />
+              <div style={{ height: y.logo, display: 'flex', alignItems: 'center' }}>
+                <Img src={staticFile(`logos/${l.file}`)} style={{ height: y.logo, width: (l.w * y.logo) / 200 }} />
               </div>
-              <div style={{ fontFamily: sans, fontSize: 19, color: c.faint }}>{l.role}</div>
+              <div style={{ fontFamily: sans, fontSize: V ? 21 : 19, color: c.faint }}>{l.role}</div>
             </div>
           ))}
         </div>

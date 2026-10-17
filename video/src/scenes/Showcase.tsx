@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
-import { c, sans, serif, SAFE_X } from '../look';
+import { c, sans, serif, SAFE_X, useLayout } from '../look';
 import { APP, T } from '../timing';
 import { CHECKED, PROGRAMMES, SAID } from '../data';
 import { LabelCaps } from '../ui/Base';
@@ -14,7 +14,7 @@ import {
   Field,
   HEADER_SCALE,
   LOCKUP,
-  LOCKUP_X,
+  lockupX,
   Lockup,
   Pill,
   Select,
@@ -66,7 +66,12 @@ const CAPTIONS = [
   },
 ];
 
-const Caption = ({ a }: { a: number }) => (
+// Where the browser sits: beside the captions (16:9) or under them (9:16).
+const VERTICAL_BROWSER = { cx: 540, cy: 1280, k: 0.94 };
+
+const Caption = ({ a }: { a: number }) => {
+  const { V } = useLayout();
+  return (
   <>
     {CAPTIONS.map((cap, i) => {
       const end = i + 1 < CAPTIONS.length ? CAPTIONS[i + 1].at : APP.out;
@@ -74,9 +79,12 @@ const Caption = ({ a }: { a: number }) => (
       const to = end - 18;
       if (a < from - 2 || a > to + 20) return null;
       return (
-        <div key={cap.label} style={{ position: 'absolute', left: SAFE_X, top: 330, width: 500 }}>
+        <div
+          key={cap.label}
+          style={{ position: 'absolute', left: V ? 110 : SAFE_X, top: V ? 320 : 330, width: V ? 860 : 500 }}
+        >
           <div style={rise(a, from, to, 20)}>
-            <LabelCaps size={17} color={c.route} style={{ letterSpacing: 3 }}>
+            <LabelCaps size={V ? 21 : 17} color={c.route} style={{ letterSpacing: 3 }}>
               {cap.label}
             </LabelCaps>
           </div>
@@ -85,7 +93,7 @@ const Caption = ({ a }: { a: number }) => (
               ...rise(a, from + 5, to, 24),
               fontFamily: serif,
               fontWeight: 600,
-              fontSize: 54,
+              fontSize: V ? 66 : 54,
               lineHeight: 1.12,
               color: c.ink,
               marginTop: 20,
@@ -97,7 +105,7 @@ const Caption = ({ a }: { a: number }) => (
             style={{
               ...rise(a, from + 12, to, 24),
               fontFamily: sans,
-              fontSize: 25,
+              fontSize: V ? 31 : 25,
               lineHeight: 1.5,
               color: c.muted,
               marginTop: 24,
@@ -109,7 +117,8 @@ const Caption = ({ a }: { a: number }) => (
       );
     })}
   </>
-);
+  );
+};
 
 // --- Directory, filters and map share one page ---------------------------
 
@@ -823,12 +832,16 @@ export const Showcase = () => {
   const a = f - LEAD;
 
   // The lockup flies from the reveal into the header.
+  const { W, cx, cy, V } = useLayout();
   const fly = glide(f, 0, LEAD);
-  const headerX = BROWSER.x + 28;
-  const headerY = BROWSER.y + BROWSER.bar + BROWSER.header / 2;
-  const flyX = lerp(fly, LOCKUP_X, headerX);
-  const flyY = lerp(fly, 540, headerY);
-  const flyS = lerp(fly, 1, HEADER_SCALE);
+  const k = V ? VERTICAL_BROWSER.k : 1;
+  const bcx = V ? VERTICAL_BROWSER.cx : BROWSER.x + BROWSER.w / 2;
+  const bcy = V ? VERTICAL_BROWSER.cy : BROWSER.y + BROWSER.h / 2;
+  const headerX = bcx + k * (28 - BROWSER.w / 2);
+  const headerY = bcy + k * (BROWSER.bar + BROWSER.header / 2 - BROWSER.h / 2);
+  const flyX = lerp(fly, lockupX(W), headerX);
+  const flyY = lerp(fly, cy, headerY);
+  const flyS = lerp(fly, 1, HEADER_SCALE * k);
 
   const open = enter(f, 8, 36);
   const shrink = glide(a, APP.out - 34, 46);
@@ -868,8 +881,10 @@ export const Showcase = () => {
         hideLogo={fly < 1}
         overlay={shrink === 0 ? <Cursor frame={a} path={cursorPath} /> : null}
         style={{
+          left: bcx - BROWSER.w / 2,
+          top: bcy - BROWSER.h / 2,
           opacity: open * (1 - shrink * 0.9),
-          transform: `scale(${lerp(open, 0.97, 1) * lerp(shrink, 1, 0.12)})`,
+          transform: `scale(${k * lerp(open, 0.97, 1) * lerp(shrink, 1, 0.12)})`,
           borderRadius: lerp(shrink, 18, 60),
         }}
       >

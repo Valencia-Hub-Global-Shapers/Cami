@@ -12,7 +12,8 @@ export const CONTENT_TOP = BROWSER.bar + BROWSER.header;
 // uses the same component at HEADER_SCALE so the two match exactly.
 export const LOCKUP = { mark: 200, gap: 22, text: 150, width: 560 };
 export const HEADER_SCALE = 0.17;
-export const LOCKUP_X = 960 - LOCKUP.width / 2;
+// Left edge of the centred hero lockup in a frame of width W.
+export const lockupX = (W: number) => W / 2 - LOCKUP.width / 2;
 
 export const Lockup = ({
   color,
